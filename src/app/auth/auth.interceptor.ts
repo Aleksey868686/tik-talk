@@ -1,4 +1,4 @@
-import { HttpHandler, HttpHandlerFn, HttpInterceptorFn, HttpRequest } from "@angular/common/http";
+import { HttpHandlerFn, HttpInterceptorFn, HttpRequest } from "@angular/common/http";
 import { AuthService } from "./auth.service";
 import { inject } from "@angular/core";
 import { catchError, switchMap, throwError } from "rxjs";
@@ -8,8 +8,8 @@ export const authTokenInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, n
     const authService: AuthService = inject(AuthService)
     const token: string | null = authService.token
 
-    if (!token) return next(req)    
-    
+    if (!token) return next(req)
+
     if (isRefreshing) {
         return refreshAndProceed(authService, req, next)
     }
@@ -26,7 +26,7 @@ export const authTokenInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, n
     )
 }
 
-const refreshAndProceed = (authService: AuthService, 
+const refreshAndProceed = (authService: AuthService,
     req: HttpRequest<any>,
     next: HttpHandlerFn) => {
         if (!isRefreshing) {
@@ -37,18 +37,15 @@ const refreshAndProceed = (authService: AuthService,
                 isRefreshing = false
                 return next(addToken(req, res.access_token))
             })
-        )    
+        )
         }
         return next(addToken(req, authService.token!))
 }
-    
-
-
 
 const addToken = (req: HttpRequest<any>, token: string) => {
     return req = req.clone({
         setHeaders: {
             Authorization: `Bearer ${token}`
-        } 
+        }
     })
 }
